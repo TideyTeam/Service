@@ -1,0 +1,5 @@
+{
+    "name": "Start on Heroku: calvinklean_service.js",
+    "description": "Data-based webservice for CalvinKlean App",
+    "repository": "https://github.com/TideyTeam/Service.git"
+  }
