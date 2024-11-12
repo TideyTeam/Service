@@ -21,12 +21,13 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage);
-router.get('/players', readPlayers);
-router.get('/players/:id', readPlayer);
-router.get('/players_games', readPlayersAndGames);  // New join endpoint
-router.put('/players/:id', updatePlayer);
-router.post('/players', createPlayer);
-router.delete('/players/:id', deletePlayer);
+router.get('/washers', readWasherAvailability);
+// router.get('/players', readPlayers);
+// router.get('/players/:id', readPlayer);
+// router.get('/players_games', readPlayersAndGames);  // New join endpoint
+// router.put('/players/:id', updatePlayer);
+// router.post('/players', createPlayer);
+// router.delete('/players/:id', deletePlayer);
 
 app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
@@ -40,69 +41,55 @@ function returnDataOr404(res, data) {
 }
 
 function readHelloMessage(req, res) {
-  res.send('Hello, CS 262 Monopoly service!');
+  res.send('Hello, Welcome to the CalvinKlean App Service!');
 }
 
-function readPlayers(req, res, next) {
-  db.many('SELECT * FROM Player')
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function readPlayer(req, res, next) {
-  db.oneOrNone('SELECT * FROM Player WHERE id=${id}', req.params)
-    .then((data) => {
-      returnDataOr404(res, data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function updatePlayer(req, res, next) {
-  db.oneOrNone('UPDATE Player SET email=${body.email}, name=${body.name} WHERE id=${params.id} RETURNING id', req)
-    .then((data) => {
-      returnDataOr404(res, data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function createPlayer(req, res, next) {
-  db.one('INSERT INTO Player(email, name) VALUES (${email}, ${name}) RETURNING id', req.body)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function deletePlayer(req, res, next) {
-  db.oneOrNone('DELETE FROM Player WHERE id=${id} RETURNING id', req.params)
-    .then((data) => {
-      returnDataOr404(res, data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function readPlayersAndGames(req, res, next) {
-  db.any(`
-  SELECT Player.name, playergame.playerid, playergame.score
-  FROM Player
-  JOIN playergame ON Player.id = playergame.playerid
-  JOIN Game ON playergame.gameid = Game.id ORDER BY playergame.score DESC`)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
+// Available washer machines
+function readWasherAvailability(req, res, next) {
+    db.manyOrNone(
+      `SELECT machine.ID, machine.type
+       FROM Machine
+       WHERE machine.type = 'washer' AND machine.availability = TRUE`
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+  
+// Get all machines (both washer and dryer) by dorm ID
+function readMachinesByDorm(req, res, next) {
+    const dormId = req.params.dormId;
+    db.manyOrNone(
+      `SELECT machine.ID, machine.type, machine.availability, dorm.name AS dorm_name
+       FROM Machine
+       JOIN MachineLocation ON Machine.ID = MachineLocation.machineID
+       JOIN Dorm ON MachineLocation.dormID = Dorm.ID
+       WHERE dorm.ID = $1`,
+      [dormId]
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+  
+  // Update the availability of a specific machine by its ID
+  function updateMachineAvailability(req, res, next) {
+    const machineId = req.params.id;
+    const { availability } = req.body;
+    db.oneOrNone(
+      `UPDATE Machine SET availability = $1 WHERE ID = $2 RETURNING ID`,
+      [availability, machineId]
+    )
+      .then((data) => {
+        returnDataOr404(res, data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
