@@ -21,7 +21,10 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage);
-router.get('/washers', readWasherAvailability);
+router.get('/availablewashers', readWasherAvailability);
+router.get('/unavailablewashers', readWasherUnavailability);
+router.get('/availabledryers', readDryerAvailability);
+router.get('/unavailabledryers', readDryerUnavailability);
 // router.get('/players', readPlayers);
 // router.get('/players/:id', readPlayer);
 // router.get('/players_games', readPlayersAndGames);  // New join endpoint
@@ -58,7 +61,48 @@ function readWasherAvailability(req, res, next) {
         next(err);
       });
   }
-  
+
+function readWasherUnavailability(req, res, next) {
+    db.manyOrNone(
+      `SELECT machine.ID, machine.type
+       FROM Machine
+       WHERE machine.type = 'washer' AND machine.availability = FALSE`
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+
+function readDryerAvailability(req, res, next) {
+    db.manyOrNone(
+      `SELECT machine.ID, machine.type
+       FROM Machine
+       WHERE machine.type = 'dryer' AND machine.availability = TRUE`
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+
+function readDryerUnavailability(req, res, next) {
+    db.manyOrNone(
+      `SELECT machine.ID, machine.type
+       FROM Machine
+       WHERE machine.type = 'dryer' AND machine.availability = FALSE`
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
 // Get all machines (both washer and dryer) by dorm ID
 function readMachinesByDorm(req, res, next) {
     const dormId = req.params.dormId;
