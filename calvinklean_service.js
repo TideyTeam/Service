@@ -51,20 +51,21 @@ function readHelloMessage(req, res) {
 // All washing machines (id 1 is available and id 3 is unavailable)
 
 function readAllWashers(req, res, next) {
-  db.manyOrNone(
-    `SELECT *
-     FROM Machine
-     WHERE id=${id}
-    `, req.params
-  )
-  .then((data) => {
-    res.send(data);
-  })
-  .catch((err) => {
-    next(err);
-  });
-}
-
+    const ids = req.params.ids.split(',').map(id => parseInt(id, 10)); // Convert to an array of integers
+    db.manyOrNone(
+      `SELECT *
+       FROM Machine
+       WHERE id = ANY($1::int[])
+      `, [ids]
+    )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+  }
+  
 // Available washer machines
 function readWasherAvailability(req, res, next) {
     db.manyOrNone(
