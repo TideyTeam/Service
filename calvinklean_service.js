@@ -21,6 +21,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage);
+router.get('/allwashers/:id', readAllWashers);
 router.get('/availablewashers', readWasherAvailability);
 router.get('/unavailablewashers', readWasherUnavailability);
 router.get('/availabledryers', readDryerAvailability);
@@ -45,6 +46,23 @@ function returnDataOr404(res, data) {
 
 function readHelloMessage(req, res) {
   res.send('Hello, Welcome to the CalvinKlean App Service!');
+}
+
+// All washing machines (id 1 is available and id 3 is unavailable)
+
+function readAllWashers(req, res, next) {
+  db.manyOrNone(
+    `SELECT machine.id, machine.type, machine.availability
+     FROM Machine
+     WHERE machine.type = 'washer'
+    `
+  )
+  .then((data) => {
+    res.send(data);
+  })
+  .catch((err) => {
+    next(err);
+  });
 }
 
 // Available washer machines
