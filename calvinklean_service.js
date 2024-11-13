@@ -52,10 +52,10 @@ function readHelloMessage(req, res) {
 
 function readAllWashers(req, res, next) {
   db.manyOrNone(
-    `SELECT machine.id, machine.type, machine.availability
+    `SELECT *
      FROM Machine
-     WHERE machine.type = 'washer'
-    `
+     WHERE id=${id}
+    `, req.params
   )
   .then((data) => {
     res.send(data);
