@@ -49,23 +49,22 @@ function readHelloMessage(req, res) {
 }
 
 // All washing machines (id 1 is available and id 3 is unavailable)
-
 function readAllWashers(req, res, next) {
-    const ids = req.params.ids.split(',').map(id => parseInt(id, 10)); // Convert to an array of integers
-    db.manyOrNone(
+    db.oneOrNone(
       `SELECT *
        FROM Machine
-       WHERE id = ANY($1::int[])
-      `, [ids]
+       WHERE machine.id = ${id}
+      `, req.params
     )
     .then((data) => {
-      res.send(data);
+      returnDataOr404(res, data);
     })
     .catch((err) => {
       next(err);
     });
   }
   
+
 // Available washer machines
 function readWasherAvailability(req, res, next) {
     db.manyOrNone(
