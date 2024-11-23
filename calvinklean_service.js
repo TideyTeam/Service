@@ -9,8 +9,7 @@ const db = pgp({
   database: process.env.DB_DATABASE,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: { rejectUnauthorized: false
-  },
+  ssl: { rejectUnauthorized: false},
 });
 
 const express = require('express');
@@ -21,11 +20,12 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage);
-router.get('/allwashers/:id', readAllWashers);
+router.get('/allwashers/:${id}',readAllWashers);
 router.get('/availablewashers', readWasherAvailability);
 router.get('/unavailablewashers', readWasherUnavailability);
 router.get('/availabledryers', readDryerAvailability);
 router.get('/unavailabledryers', readDryerUnavailability);
+router.get('/testtemp', testing);
 // router.get('/players', readPlayers);
 // router.get('/players/:id', readPlayer);
 // router.get('/players_games', readPlayersAndGames);  // New join endpoint
@@ -150,6 +150,19 @@ function readMachinesByDorm(req, res, next) {
     )
       .then((data) => {
         returnDataOr404(res, data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+
+  function testing(req, res, next) {
+    db.manyOrNone(
+      `SELECT *
+       FROM temp`
+    )
+      .then((data) => {
+        res.send(data);
       })
       .catch((err) => {
         next(err);
