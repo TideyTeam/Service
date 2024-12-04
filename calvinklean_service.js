@@ -28,6 +28,7 @@ router.get('/unavailablewashers', readWasherUnavailability);
 router.get('/availabledryers', readDryerAvailability);
 router.get('/unavailabledryers', readDryerUnavailability);
 router.get('/testtemp', testing);
+router.get('getmachine1', getmachine1);
 // router.get('/players', readPlayers);
 // router.get('/players/:id', readPlayer);
 // router.get('/players_games', readPlayersAndGames);  // New join endpoint
@@ -163,6 +164,18 @@ function readMachinesByDorm(req, res, next) {
     db.manyOrNone(
       `SELECT *
        FROM temp`
+    )
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+
+  function getmachine1(req, res, next) {
+    db.oneOrNone(
+      `SELECT machine.ID, machine.availability FROM machine WHERE machine.ID = 1`
     )
       .then((data) => {
         res.send(data);
