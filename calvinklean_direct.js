@@ -13,7 +13,7 @@ const db = pgp({
 
 console.log("Connecting to database:", process.env.DB_DATABASE); // Log to confirm the database name
 
-db.many('SELECT * FROM your_table')
+db.many('SELECT * FROM Machine')
   .then((data) => {
     console.log(data);
   })
