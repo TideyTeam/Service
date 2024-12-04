@@ -22,7 +22,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage);
-router.get('/allwashers/:${id}',readAllWashers);
+router.get('/allwashers/:id', readAllWashers);
 router.get('/availablewashers', readWasherAvailability);
 router.get('/unavailablewashers', readWasherUnavailability);
 router.get('/availabledryers', readDryerAvailability);
@@ -52,19 +52,20 @@ function readHelloMessage(req, res) {
 
 // All washing machines (id 1 is available and id 3 is unavailable)
 function readAllWashers(req, res, next) {
-    db.oneOrNone(
-      `SELECT *
-       FROM Machine
-       WHERE machine.id = ${id}
-      `, req.params
-    )
-    .then((data) => {
-      returnDataOr404(res, data);
-    })
-    .catch((err) => {
-      next(err);
-    });
-  }
+  db.oneOrNone(
+    `SELECT * 
+     FROM Machine 
+     WHERE machine.id = $1`, 
+    [req.params.id]
+  )
+  .then((data) => {
+    returnDataOr404(res, data);
+  })
+  .catch((err) => {
+    next(err);
+  });
+}
+
   
 
 // Available washer machines
