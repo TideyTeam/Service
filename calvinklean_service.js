@@ -28,7 +28,7 @@ router.get('/unavailablewashers', readWasherUnavailability);
 router.get('/availabledryers', readDryerAvailability);
 router.get('/unavailabledryers', readDryerUnavailability);
 router.get('/testtemp', testing);
-router.get('getmachine1', getmachine1);
+router.get('/getmachine1', getmachine1);
 // router.get('/players', readPlayers);
 // router.get('/players/:id', readPlayer);
 // router.get('/players_games', readPlayersAndGames);  // New join endpoint
