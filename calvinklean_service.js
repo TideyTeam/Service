@@ -175,7 +175,9 @@ function readMachinesByDorm(req, res, next) {
 
   function getmachine1(req, res, next) {
     db.oneOrNone(
-      `SELECT machine.ID, machine.availability FROM machine WHERE machine.ID = 1`
+      `SELECT machine.ID, machine.availability, machine.type 
+      FROM machine 
+      WHERE machine.ID = 1`
     )
       .then((data) => {
         res.send(data);
