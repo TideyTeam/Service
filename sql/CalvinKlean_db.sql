@@ -28,7 +28,12 @@ INSERT INTO Dorm (ID, name) VALUES (1, 'Vanderwerp');
 INSERT INTO Dorm (ID, name) VALUES (2, 'Noordewier');
 
 INSERT INTO Machine (ID, type, availability) VALUES (1, 'washer', true);
-INSERT INTO Machine (ID, type, availability) VALUES (2, 'dryer', true);
-INSERT INTO Machine (ID, type, availability) VALUES (3, 'washer', false);
+INSERT INTO Machine (ID, type, availability) VALUES (2, 'washer', true);
+INSERT INTO Machine (ID, type, availability) VALUES (3, 'washer', true);
+INSERT INTO Machine (ID, type, availability) VALUES (4, 'dryer', true);
+INSERT INTO Machine (ID, type, availability) VALUES (5, 'dryer', true);
+INSERT INTO Machine (ID, type, availability) VALUES (6, 'dryer', true);
+
+
 
 INSERT INTO MachineLocation (ID, machineID, dormID) VALUES (1, 3, 2); -- Machine 3 in Dorm B
