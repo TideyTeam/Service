@@ -22,7 +22,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/', readHelloMessage); // Welcome message
-router.get('/allwashers/:id', getMachineById); // Fetch a specific machine by ID
+router.get('/allmachines/:id', getMachineById); // Fetch a specific machine by ID
 router.get('/availablewashers', readWasherAvailability); // Fetch available washers
 router.get('/unavailablewashers', readWasherUnavailability); // Fetch unavailable washers
 router.get('/availabledryers', readDryerAvailability); // Fetch available dryers
