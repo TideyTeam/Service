@@ -11,7 +11,7 @@ const db = pgp({
   database: process.env.DB_DATABASE,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: { rejectUnauthorized: false},
+  ssl: { rejectUnauthorized: false },
 });
 
 const express = require('express');
@@ -21,26 +21,21 @@ const port = process.env.PORT || 3000;
 const router = express.Router();
 router.use(express.json());
 
-router.get('/', readHelloMessage);
-router.get('/allwashers/:id', getMachineById);
-router.get('/availablewashers', readWasherAvailability);
-router.get('/unavailablewashers', readWasherUnavailability);
-router.get('/availabledryers', readDryerAvailability);
-router.get('/unavailabledryers', readDryerUnavailability);
-router.get('/testtemp', testing);
-router.get('/getmachine1', getmachine1);
-router.get('/getmachine4', getmachine4);
-
-// router.get('/players', readPlayers);
-// router.get('/players/:id', readPlayer);
-// router.get('/players_games', readPlayersAndGames);  // New join endpoint
-// router.put('/players/:id', updatePlayer);
-// router.post('/players', createPlayer);
-// router.delete('/players/:id', deletePlayer);
+router.get('/', readHelloMessage); // Welcome message
+router.get('/allwashers/:id', getMachineById); // Fetch a specific machine by ID
+router.get('/availablewashers', readWasherAvailability); // Fetch available washers
+router.get('/unavailablewashers', readWasherUnavailability); // Fetch unavailable washers
+router.get('/availabledryers', readDryerAvailability); // Fetch available dryers
+router.get('/unavailabledryers', readDryerUnavailability); // Fetch unavailable dryers
 
 app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
+/**
+ * Checks if data is null and sends a 404 response if true, otherwise sends the data.
+ * @param {object} res - The Express response object.
+ * @param {object} data - The data to be checked and sent.
+ */
 function returnDataOr404(res, data) {
   if (data == null) {
     res.sendStatus(404);
@@ -49,13 +44,20 @@ function returnDataOr404(res, data) {
   }
 }
 
+/**
+ * Sends a welcome message to the client.
+ * Endpoint: GET /
+ */
 function readHelloMessage(req, res) {
   res.send('Hello, Welcome to the CalvinKlean App Service!');
 }
 
-// All washing machines (id 1 is available and id 3 is unavailable)
+/**
+ * Fetches a specific machine by its ID.
+ * Endpoint: GET /allwashers/:id
+ */
 function getMachineById(req, res, next) {
-  const id = req.params.id; 
+  const id = req.params.id;
   db.oneOrNone(
     `SELECT machine.ID, machine.availability, machine.type 
     FROM machine 
@@ -70,136 +72,74 @@ function getMachineById(req, res, next) {
     });
 }
 
-  
-
-// Available washer machines
+/**
+ * Fetches all available washers.
+ * Endpoint: GET /availablewashers
+ */
 function readWasherAvailability(req, res, next) {
-    db.manyOrNone(
-      `SELECT machine.ID, machine.type
+  db.manyOrNone(
+    `SELECT machine.ID, machine.type
        FROM Machine
        WHERE machine.type = 'washer' AND machine.availability = TRUE`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
 
+/**
+ * Fetches all unavailable washers.
+ * Endpoint: GET /unavailablewashers
+ */
 function readWasherUnavailability(req, res, next) {
-    db.manyOrNone(
-      `SELECT machine.ID, machine.type
+  db.manyOrNone(
+    `SELECT machine.ID, machine.type
        FROM Machine
        WHERE machine.type = 'washer' AND machine.availability = FALSE`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
 
+/**
+ * Fetches all available dryers.
+ * Endpoint: GET /availabledryers
+ */
 function readDryerAvailability(req, res, next) {
-    db.manyOrNone(
-      `SELECT machine.ID, machine.type
+  db.manyOrNone(
+    `SELECT machine.ID, machine.type
        FROM Machine
        WHERE machine.type = 'dryer' AND machine.availability = TRUE`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
 
+/**
+ * Fetches all unavailable dryers.
+ * Endpoint: GET /unavailabledryers
+ */
 function readDryerUnavailability(req, res, next) {
-    db.manyOrNone(
-      `SELECT machine.ID, machine.type
+  db.manyOrNone(
+    `SELECT machine.ID, machine.type
        FROM Machine
        WHERE machine.type = 'dryer' AND machine.availability = FALSE`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
-// Get all machines (both washer and dryer) by dorm ID
-function readMachinesByDorm(req, res, next) {
-    const dormId = req.params.dormId;
-    db.manyOrNone(
-      `SELECT machine.ID, machine.type, machine.availability, dorm.name AS dorm_name
-       FROM Machine
-       JOIN MachineLocation ON Machine.ID = MachineLocation.machineID
-       JOIN Dorm ON MachineLocation.dormID = Dorm.ID
-       WHERE dorm.ID = $1`,
-      [dormId]
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
-  
-  // Update the availability of a specific machine by its ID
-  function updateMachineAvailability(req, res, next) {
-    const machineId = req.params.id;
-    const { availability } = req.body;
-    db.oneOrNone(
-      `UPDATE Machine SET availability = $1 WHERE ID = $2 RETURNING ID`,
-      [availability, machineId]
-    )
-      .then((data) => {
-        returnDataOr404(res, data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
-
-  function testing(req, res, next) {
-    db.manyOrNone(
-      `SELECT *
-       FROM temp`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
-
-  function getmachine1(req, res, next) {
-    db.oneOrNone(
-      `SELECT machine.ID, machine.availability, machine.type 
-      FROM machine 
-      WHERE machine.ID = 1`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
-
-  function getmachine4(req, res, next) {
-    db.oneOrNone(
-      `SELECT machine.ID, machine.availability, machine.type 
-      FROM machine 
-      WHERE machine.ID = 4`
-    )
-      .then((data) => {
-        res.send(data);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  }
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
