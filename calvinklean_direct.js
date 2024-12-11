@@ -1,7 +1,4 @@
 const pgp = require('pg-promise')();
-
-//require('dotenv').config(); // Ensures .env file is loaded
-
 const db = pgp({
   host: process.env.DB_SERVER,
   port: process.env.DB_PORT,
@@ -13,6 +10,10 @@ const db = pgp({
 
 console.log("Connecting to database:", process.env.DB_DATABASE); // Log to confirm the database name
 
+/**
+ * Fetches all records from the 'Machine' table and logs them.
+ * Logs any errors encountered during the query.
+ */
 db.many('SELECT * FROM Machine')
   .then((data) => {
     console.log(data);
