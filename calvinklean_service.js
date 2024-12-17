@@ -23,6 +23,7 @@ router.use(express.json());
 
 router.get('/', readHelloMessage); // Welcome message
 router.get('/allmachines/:id', getMachineById); // Fetch a specific machine by ID
+router.get('/allmachines', allMachines) // Fetch All machines
 router.get('/availablewashers', readWasherAvailability); // Fetch available washers
 router.get('/unavailablewashers', readWasherUnavailability); // Fetch unavailable washers
 router.get('/availabledryers', readDryerAvailability); // Fetch available dryers
@@ -50,6 +51,20 @@ function returnDataOr404(res, data) {
  */
 function readHelloMessage(req, res) {
   res.send('Hello, Welcome to the CalvinKlean App Service!');
+}
+
+function allMachines(req, res, next) {
+  const id = req.params.id;
+  db.oneOrNone(
+    `SELECT machine.ID, machine.availability, machine.type 
+    FROM machine `
+  )
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
 }
 
 /**
