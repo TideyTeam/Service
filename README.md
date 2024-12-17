@@ -7,9 +7,14 @@ This is the data service application for the CS 262 sample Monopoly project, whi
 It has the following read data route URLs:
 
 / - a hello message 
+
 /allmachines/:id - gets machine by id 
+
 /availablewashers - gets available washers 
+
 /unavailablewashers - gets unavailable washers 
+
 /availabledryers - gets available dryers 
+
 /unavailabledryers - gets unavailable dryers
 
